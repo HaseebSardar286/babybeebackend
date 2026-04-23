@@ -29,7 +29,7 @@ public class AuthController {
      * @return an ApiResponse indicating the outcome of the registration
      */
     @PostMapping("/register")
-    public ApiResponse register(@RequestBody RegisterRequest request) {
+    public ApiResponse<Void> register(@RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 

@@ -19,7 +19,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Filter that intercepts incoming HTTP requests to validate JWT tokens.
- * Extracts the token from the Authorization header and sets the authentication context.
+ * Extracts the token from the Authorization header and sets the authentication
+ * context.
  */
 @Component
 @RequiredArgsConstructor
@@ -30,8 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * intercepts each request to check for a valid JWT token.
      * If valid, sets the authentication object in the Spring Security context.
      *
-     * @param request  the HTTP request
-     * @param response the HTTP response
+     * @param request     the HTTP request
+     * @param response    the HTTP response
      * @param filterChain the filter chain
      * @throws ServletException if a servlet error occurs
      * @throws IOException      if an I/O error occurs
@@ -39,6 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        // ✅ SKIP preflight
+        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -48,13 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractRole(token);
-            
+
             // Handle old tokens or missing roles gracefully
             if (role == null) {
-                role = "USER"; 
+                role = "USER";
             }
             role = role.toUpperCase(); // Spring expects ROLE_USER or ROLE_ADMIN format
-            
+
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null,
                     List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
