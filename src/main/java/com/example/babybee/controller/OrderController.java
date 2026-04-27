@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Provides endpoints for placing and retrieving user orders.
  */
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
 

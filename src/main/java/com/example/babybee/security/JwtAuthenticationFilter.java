@@ -40,37 +40,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        // ✅ SKIP preflight
+
+        // Skip preflight
         if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        // Skip public auth endpoints — never block login/register
+        String path = request.getServletPath();
+        if (path.startsWith("/api/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
+
         String token = authHeader.substring(7);
         try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractRole(token);
 
-            // Handle old tokens or missing roles gracefully
             if (role == null) {
                 role = "USER";
             }
-            role = role.toUpperCase(); // Spring expects ROLE_USER or ROLE_ADMIN format
+            role = role.toUpperCase();
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    email, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication); // Tells Spring Security that the user
-                                                                                  // is authenticated
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid Token");
-            return;
+            // Token is invalid — clear context but let Spring Security handle the 401
+            SecurityContextHolder.clearContext();
         }
+
         filterChain.doFilter(request, response);
     }
 

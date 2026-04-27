@@ -13,13 +13,17 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * REST controller for managing the user's shopping cart.
- * Provides endpoints to add items to the cart and retrieve cart items.
+ * Provides endpoints to add, update, remove, and retrieve cart items.
  */
 @RestController
 @RequestMapping("/api/cart")
@@ -29,11 +33,6 @@ public class CartController {
 
     /**
      * Adds a product to the authenticated user's cart.
-     *
-     * @param request        the cart request containing product details and
-     *                       quantity
-     * @param authentication the current authenticated user
-     * @return the saved Cart item
      */
     @PostMapping("/add")
     public ApiResponse<Cart> addToCart(@RequestBody CartRequest request, Authentication authentication) {
@@ -48,9 +47,6 @@ public class CartController {
 
     /**
      * Retrieves all cart items for the authenticated user.
-     *
-     * @param authentication the current authenticated user
-     * @return a list of Cart items belonging to the user
      */
     @GetMapping
     public ApiResponse<List<Cart>> getCartItems(Authentication authentication) {
@@ -63,4 +59,33 @@ public class CartController {
                 .build();
     }
 
+    /**
+     * Removes a specific cart item by its ID.
+     */
+    @DeleteMapping("/{cartItemId}")
+    public ApiResponse<Void> removeFromCart(@PathVariable Long cartItemId, Authentication authentication) {
+        String email = authentication.getName();
+        cartService.removeFromCart(cartItemId, email);
+        return ApiResponse.<Void>builder()
+                .message("Item removed from cart")
+                .success(true)
+                .build();
+    }
+
+    /**
+     * Updates the quantity of a specific cart item.
+     */
+    @PatchMapping("/{cartItemId}")
+    public ApiResponse<Cart> updateQuantity(
+            @PathVariable Long cartItemId,
+            @RequestParam int quantity,
+            Authentication authentication) {
+        String email = authentication.getName();
+        Cart updated = cartService.updateQuantity(cartItemId, quantity, email);
+        return ApiResponse.<Cart>builder()
+                .message("Quantity updated")
+                .success(true)
+                .data(updated)
+                .build();
+    }
 }

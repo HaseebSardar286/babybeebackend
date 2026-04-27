@@ -48,4 +48,37 @@ public class CartService {
     public List<Cart> getCartItems(String userEmail) {
         return cartRepository.findByUserEmail(userEmail);
     }
+
+    /**
+     * Removes a cart item by its ID, ensuring it belongs to the authenticated user.
+     *
+     * @param cartItemId the ID of the cart item to remove
+     * @param userEmail  the email of the authenticated user
+     */
+    public void removeFromCart(Long cartItemId, String userEmail) {
+        Cart cart = cartRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+        if (!cart.getUserEmail().equals(userEmail)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        cartRepository.deleteById(cartItemId);
+    }
+
+    /**
+     * Updates the quantity of an existing cart item.
+     *
+     * @param cartItemId the ID of the cart item
+     * @param quantity   the new quantity
+     * @param userEmail  the email of the authenticated user
+     * @return the updated cart item
+     */
+    public Cart updateQuantity(Long cartItemId, int quantity, String userEmail) {
+        Cart cart = cartRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+        if (!cart.getUserEmail().equals(userEmail)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        cart.setQuantity(quantity);
+        return cartRepository.save(cart);
+    }
 }
