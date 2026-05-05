@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    // Filter for JWT validation
     private final JwtUtil jwtUtil;
 
     /**

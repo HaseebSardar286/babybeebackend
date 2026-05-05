@@ -50,14 +50,20 @@ public class AuthService {
      * @return the AuthResponse with token or an error message
      */
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
-        if (user == null) {
-            return new AuthResponse(null, "User Not Found");
+        try {
+            User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+            if (user == null) {
+                return new AuthResponse(null, "User Not Found");
+            }
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                return new AuthResponse(null, "Invalid Password");
+            }
+            String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+            return new AuthResponse(token, "Login Success");
+        } catch (Exception e) {
+            System.err.println("CRITICAL LOGIN ERROR: " + e.getMessage());
+            e.printStackTrace();
+            return new AuthResponse(null, "Internal Server Error: " + e.getMessage());
         }
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return new AuthResponse(null, "Invalid Password");
-        }
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
-        return new AuthResponse(token, "Login Success");
     }
 }
