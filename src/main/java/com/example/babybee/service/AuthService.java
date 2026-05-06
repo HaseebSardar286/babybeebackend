@@ -12,46 +12,57 @@ import com.example.babybee.repository.UserRepository;
 import com.example.babybee.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import java.time.LocalDateTime;
 
 /**
- * Service class for handling user authentication and registration logic.
+ * Service class for handling user authentication and registration logic using
+ * raw SQL.
  */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     /**
-     * Registers a new user account.
-     *
-     * @param request the registration details
-     * @return the API response indicating the outcome
+     * Registers a new user account using raw SQL.
      */
-    public ApiResponse register(RegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return new ApiResponse("User Already Exists", false, null);
-        }
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
-        user.setStatus(request.getStatus());
+    public ApiResponse<User> register(RegisterRequest request) {
+        // Check if user exists using SQL
+        String checkSql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, request.getEmail());
 
-        userRepository.save(user);
-        return new ApiResponse("User Registered Successfully", true, null);
+        if (count != null && count > 0) {
+            return new ApiResponse<User>("User Already Exists", false, null);
+        }
+
+        // Insert using SQL
+        String insertSql = "INSERT INTO users (name, email, password, role, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(insertSql,
+                request.getName(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                "USER",
+                "ACTIVE",
+                LocalDateTime.now(),
+                LocalDateTime.now());
+
+        return new ApiResponse<User>("User Registered Successfully", true, null);
     }
 
     /**
-     * Authenticates a user and generates a JWT token if successful.
-     *
-     * @param request the login credentials
-     * @return the AuthResponse with token or an error message
+     * Authenticates a user using raw SQL.
      */
     public AuthResponse login(LoginRequest request) {
         try {
-            User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+            String selectSql = "SELECT * FROM users WHERE email = ?";
+            User user = jdbcTemplate.queryForObject(selectSql, new BeanPropertyRowMapper<>(User.class),
+                    request.getEmail());
+
             if (user == null) {
                 return new AuthResponse(null, "User Not Found");
             }
@@ -62,8 +73,7 @@ public class AuthService {
             return new AuthResponse(token, "Login Success");
         } catch (Exception e) {
             System.err.println("CRITICAL LOGIN ERROR: " + e.getMessage());
-            e.printStackTrace();
-            return new AuthResponse(null, "Internal Server Error: " + e.getMessage());
+            return new AuthResponse(null, "User Not Found or Internal Error");
         }
     }
 }

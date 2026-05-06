@@ -32,7 +32,7 @@ public class ProductService {
                 .category(productRequest.getCategory())
                 .price(productRequest.getPrice())
                 .description(productRequest.getDescription())
-                .quantity(productRequest.getQuantity())
+                .stock(productRequest.getStock())
                 .build();
 
         return productRepository.save(product);

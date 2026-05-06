@@ -11,5 +11,5 @@ public class ProductRequest {
     private String category;
     private double price;
     private String description;
-    private int quantity;
+    private int stock;
 }

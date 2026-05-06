@@ -34,15 +34,25 @@ public class Product {
     private double price;
 
     /** Available quantity of the product in stock. */
-    private int quantity;
+    private int stock;
 
     /** The category to which the product belongs. */
     private String category;
 
+    /** URL for the product image. */
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    /** Whether the product is available for sale. */
+    @Column(name = "is_active")
+    private boolean isActive = true;
+
     /** Timestamp when the product was created. */
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
     /** Timestamp when the product was last updated. */
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     /**

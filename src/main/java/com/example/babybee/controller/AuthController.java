@@ -9,6 +9,7 @@ import com.example.babybee.dto.ApiResponse;
 import com.example.babybee.dto.AuthResponse;
 import com.example.babybee.dto.LoginRequest;
 import com.example.babybee.dto.RegisterRequest;
+import com.example.babybee.entity.User;
 import com.example.babybee.service.AuthService;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +30,7 @@ public class AuthController {
      * @return an ApiResponse indicating the outcome of the registration
      */
     @PostMapping("/register")
-    public ApiResponse<Void> register(@RequestBody RegisterRequest request) {
+    public ApiResponse<User> register(@RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 

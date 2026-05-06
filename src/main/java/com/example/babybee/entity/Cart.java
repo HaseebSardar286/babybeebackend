@@ -21,10 +21,12 @@ public class Cart {
     private Long id;
 
     /** Email of the user who owns this cart. */
+    @Column(name = "user_email")
     private String userEmail;
 
     /** The product associated with this cart item. */
     @ManyToOne
+    @JoinColumn(name = "product_id")
     private Product product;
 
     /** The quantity of the product in the cart. */

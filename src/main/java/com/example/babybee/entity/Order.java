@@ -22,9 +22,11 @@ public class Order {
     private Long id;
 
     /** Email of the user who placed the order. */
+    @Column(name = "user_email")
     private String userEmail;
 
     /** The total monetary amount of the order. */
+    @Column(name = "total_amount")
     private double totalAmount;
 
     /** 
@@ -34,10 +36,12 @@ public class Order {
     private String status;
 
     /** The date and time when the order was created. */
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     /** The list of items included in this order. */
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id")
     private List<OrderItem> items;
 
     /**

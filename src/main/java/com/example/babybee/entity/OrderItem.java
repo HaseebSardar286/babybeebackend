@@ -20,6 +20,7 @@ public class OrderItem {
     private Long id;
 
     /** The name of the purchased product. */
+    @Column(name = "product_name")
     private String productName;
 
     /** The price of a single unit of the product. */
