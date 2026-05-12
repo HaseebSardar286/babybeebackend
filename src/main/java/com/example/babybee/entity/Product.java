@@ -45,15 +45,20 @@ public class Product {
 
     /** Whether the product is available for sale. */
     @Column(name = "is_active")
+    @Builder.Default
     private boolean isActive = true;
 
     /** Timestamp when the product was created. */
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-    
+
     /** Timestamp when the product was last updated. */
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category categoryEntity;
 
     /**
      * Automatically sets createdAt and updatedAt before persisting.

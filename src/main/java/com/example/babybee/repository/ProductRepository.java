@@ -12,12 +12,16 @@ import org.springframework.data.repository.query.Param;
  * Repository interface for managing Product entities.
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    
+
     @Query(value = "SELECT * FROM products WHERE LOWER(name) LIKE LOWER(CONCAT('%', :keyword, '%'))", nativeQuery = true)
     List<Product> findByNameIgnoreCaseContaining(@Param("keyword") String keyword);
 
     @Query(value = "SELECT * FROM products WHERE LOWER(category) LIKE LOWER(CONCAT('%', :category, '%'))", nativeQuery = true)
     List<Product> findByCategoryIgnoreCaseContaining(@Param("category") String category);
+
+    @Query(value = "SELECT p.* FROM products p " + "JOIN categories c ON p.category_id = c.id "
+            + "WHERE c.slug = :categorySlug AND p.is_active = true", nativeQuery = true)
+    List<Product> findByCategorySlug(@Param("categorySlug") String categorySlug);
 
     @Query(value = "SELECT * FROM products", nativeQuery = true)
     Page<Product> findAll(Pageable pageable);

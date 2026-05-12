@@ -3,11 +3,11 @@ package com.example.babybee.service;
 import com.example.babybee.entity.*;
 import com.example.babybee.repository.*;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import javax.management.RuntimeErrorException;
 
 /**
  * Service responsible for processing orders.
@@ -69,7 +69,7 @@ public class OrderService {
      * @param status  the updated status
      * @return the updated Order entity
      */
-    public Order updateOrderStatus(Long orderId, String status) {
+    public Order updateOrderStatus(@NonNull Long orderId, String status) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found!"));
         order.setStatus(status);
         return orderRepository.save(order);

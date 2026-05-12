@@ -59,6 +59,14 @@ public class ProductService {
         if (category == null || category.isEmpty()) {
             return productRepository.findAll();
         }
+        
+        // 1. Try fetching by the new Category Slug system (Total Control)
+        List<Product> dynamicProducts = productRepository.findByCategorySlug(category);
+        if (!dynamicProducts.isEmpty()) {
+            return dynamicProducts;
+        }
+
+        // 2. Fallback to old text-based category matching (Backwards Compatibility)
         String lowerCaseCategory = category.toLowerCase();
         return productRepository.findByCategoryIgnoreCaseContaining(lowerCaseCategory);
     }

@@ -8,7 +8,6 @@ import com.example.babybee.dto.AuthResponse;
 import com.example.babybee.dto.LoginRequest;
 import com.example.babybee.dto.RegisterRequest;
 import com.example.babybee.entity.User;
-import com.example.babybee.repository.UserRepository;
 import com.example.babybee.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
     private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;

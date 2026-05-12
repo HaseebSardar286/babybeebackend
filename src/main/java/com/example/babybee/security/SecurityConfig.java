@@ -37,6 +37,8 @@ public class SecurityConfig {
                                                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/api/categories/**").permitAll()
+                                                .requestMatchers("/api/products/**").permitAll()
                                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                                 .requestMatchers("/api/user/**").hasRole("USER")
                                                 .anyRequest().authenticated())

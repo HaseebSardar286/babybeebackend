@@ -8,13 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import java.util.Map;
 
 /**
  * REST controller for managing orders.
@@ -73,7 +68,8 @@ public class OrderController {
 
     @PutMapping("/admin/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<Order> updateOrderStatus(@PathVariable Long id, @RequestBody String status) {
+    public ApiResponse<Order> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String status = payload.get("status");
         Order order = orderService.updateOrderStatus(id, status);
         return ApiResponse.<Order>builder()
                 .message("Order status updated successfully")
