@@ -1,5 +1,6 @@
 package com.example.babybee.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 public class EmailService {
     private final JavaMailSender mailSender;
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     /**
      * Sends a secure password reset code to the specified user email.
      *
@@ -21,7 +25,7 @@ public class EmailService {
      * @param code    the secure 6-digit verification code
      */
     public void sendResetToken(String toEmail, String code) {
-        String resetLink = "http://localhost:3000/reset-password?code=" + code;
+        String resetLink = frontendUrl + "/reset-password?code=" + code;
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
